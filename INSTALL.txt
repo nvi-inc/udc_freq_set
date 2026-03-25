@@ -1,0 +1,10 @@
+    prompt> log in as root
+    prompt> cd /usr2
+    prompt> git clone https://github.com/nvi-inc/udc_freq_set
+    prompt> chown -R prog.rtx udc_freq_set
+    prompt> log in as prog
+    prompt> cd /usr2/udc_freq_set
+    prompt> make
+    prompt> log in as oper
+    prompt> cd /usr2/udc_freq_set
+    prompt> make install
