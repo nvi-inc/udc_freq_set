@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <libgen.h>
 
 #include "/usr2/fs/include/params.h"
 #include "/usr2/fs/include/fs_types.h"
@@ -32,9 +33,59 @@ static int ip[5] = { 0, 0, 0, 0, 0};
 
 int main(int argc, char **argv)
 {
-  int i;
+  int i,start,stop;
   char number[17];
   char command[128];
+
+  if(argc>2) {
+    fprintf(stderr,"Only one argument is allowed\n");
+    exit(-1);
+  } else if(argc==2) {
+    if(strcmp(argv[1],"-h")==0) {
+      fprintf(stderr,
+          "Usage: %s [-h]|[band]\n"
+          "\n"
+          "  band is one of a, b, c, or d, case insensitive. Default is all.\n"
+          "\n"
+          "Options\n"
+          "  -h    this help output"
+          "\n",basename(argv[0]));
+      exit(-1);
+    } else if(1<strlen(argv[1])) {
+      fprintf(stderr,"Bad band specifier: '%s', must be a single character\n",argv[1]);
+      exit(-1);
+    } else {
+      switch (*argv[1]) {
+        case 'a':
+        case 'A':
+          start=0;
+          stop=1;
+          break;
+        case 'b':
+        case 'B':
+          start=2;
+          stop=3;
+          break;
+        case 'c':
+        case 'C':
+          start=4;
+          stop=5;
+          break;
+        case 'd':
+        case 'D':
+          start=6;
+          stop=7;
+          break;
+        default:
+          fprintf(stderr,"Unknown band: '%c'\n",*argv[1]);
+          exit(-1);
+          break;
+      }
+    }
+  } else {
+    start=0; stop=7;
+  }
+
 
   setup_ids();
 
@@ -43,7 +94,7 @@ int main(int argc, char **argv)
     exit(-1);
   }
 
-  for(i=0;i<MAX_LO;i++) {
+  for(i=start;i<=stop;i++) {
     if(shm_addr->lo.lo[i]<0.0 || 1==i%2 && shm_addr->lo.lo[i-1]>=0.0)
       continue;
     snprintf(number,sizeof(number),"%lf",shm_addr->lo.lo[i]);
